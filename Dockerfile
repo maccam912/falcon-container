@@ -10,4 +10,4 @@ FROM ubuntu as deploy
 WORKDIR /app
 COPY --from=build /app/ggllm.cpp/build/bin/* /usr/local/bin/
 COPY startup.sh .
-CMD ["./startup.sh"]
+CMD bash startup.sh
