@@ -7,5 +7,7 @@ WORKDIR /app/ggllm.cpp
 RUN cmake -B build -G Ninja -DLLAMA_AVX2=OFF -DLLAMA_FMA=OFF -DLLAMA_CUBLAS=OFF . && cmake --build build --config Release
 
 FROM ubuntu as deploy
+WORKDIR /app
 COPY --from=build /app/ggllm.cpp/build/bin/* /usr/local/bin/
-CMD /usr/local/bin/falcon_main
+COPY startup.sh .
+CMD ["./startup.sh"]
