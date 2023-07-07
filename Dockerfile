@@ -1,8 +1,11 @@
-FROM ubuntu
+FROM ubuntu as build
 
-RUN sed -n 's/^deb /deb-src /p' /etc/apt/sources.list > tmpsrc && cat tmpsrc >> /etc/apt/sources.list
-WORKDIR /root
-RUN apt-get update && apt-get install wget build-essential -y && apt-get build-dep -y libatlas-base-dev && apt-get source libatlas-base-dev
+WORKDIR /app
+RUN apt-get update && apt-get install wget build-essential git ninja-build cmake pkg-config -y
+RUN git clone https://github.com/cmp-nct/ggllm.cpp --recursive
+WORKDIR /app/ggllm.cpp
+RUN cmake -B build -G Ninja . && cmake --build build --config Release
 
-WORKDIR /root/atlas-3.10.3
-RUN mkdir build && cd build && ../configure --cripple-atlas-performance && make --debug && make install
+FROM ubuntu as deploy
+COPY --from=build /app/ggllm.cpp/build/bin/* /usr/local/bin/
+CMD /usr/local/bin/falcon_main
