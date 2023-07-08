@@ -80,6 +80,8 @@ class FalconController(Controller):
                 "11",
                 "-c",
                 "2048",
+                "-b",
+                "64",
                 "-m",
                 "/app/models/wizardlm-uncensored-falcon-40b.ggccv1.q5_k.bin",
                 "-p",
