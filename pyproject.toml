@@ -9,6 +9,7 @@ authors = [
 dependencies = [
     "litestar>=2.0.0b2",
     "uvicorn>=0.22.0",
+    "pydantic>=1.10.11",
 ]
 requires-python = ">=3.11"
 license = {text = "MIT"}
