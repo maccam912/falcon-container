@@ -83,7 +83,7 @@ class FalconController(Controller):
                 "-b",
                 "64",
                 "-m",
-                "/app/models/wizardlm-uncensored-falcon-40b.ggccv1.q5_k.bin",
+                "/app/models/wizardlm-7b-uncensored.ggccv1.q8_0.bin",
                 "-p",
                 prompt,
             ],
