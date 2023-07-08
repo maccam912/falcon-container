@@ -1,8 +1,12 @@
+from math import log
 from typing import List, Literal
 from litestar import Litestar
 from litestar import Controller, post
 from pydantic import BaseModel
 import subprocess
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Message(BaseModel):
@@ -70,10 +74,11 @@ class FalconController(Controller):
 
     @post()
     async def run(self, data: Request) -> Response:
+        logger.info("In run")
         try:
-            print("Got request")
+            logger.info("Got request")
             prompt = create_prompt(data.messages)
-            print("created prompt")
+            logger.info("created prompt")
             result = subprocess.run(
                 [
                     "/usr/local/bin/falcon_main",
@@ -94,16 +99,17 @@ class FalconController(Controller):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
             )
-            print("ran subprocess")
+            logger.info("ran subprocess")
             response = (
                 result.stdout.replace(prompt, "").replace("<|endoftext|>", "").strip()
             )
 
-            print("Parsed response, creating response object")
+            logger.info("Parsed response, creating response object")
             return create_response(response)
         except Exception as e:
             # print traceback
             print(e)
+            logger.error(e)
             return create_response("Error")
 
 
