@@ -70,35 +70,41 @@ class FalconController(Controller):
 
     @post()
     async def run(self, data: Request) -> Response:
-        print(data.messages)
-        prompt = create_prompt(data.messages)
-        print(f"Calling falcon with prompt: {prompt}")
-        result = subprocess.run(
-            [
-                "/usr/local/bin/falcon_main",
-                "-t",
-                "11",
-                "-c",
-                "2048",
-                "-b",
-                "64",
-                "--prompt-cache",
-                "/app/models/cache",
-                "--prompt-cache-all",
-                "-m",
-                "/app/models/wizardlm-7b-uncensored.ggccv1.q8_0.bin",
-                "-p",
-                prompt,
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        response = (
-            result.stdout.replace(prompt, "").replace("<|endoftext|>", "").strip()
-        )
-        print(f"{response}\nResponding with that ^^^")
+        try:
+            print("Got request")
+            prompt = create_prompt(data.messages)
+            print("created prompt")
+            result = subprocess.run(
+                [
+                    "/usr/local/bin/falcon_main",
+                    "-t",
+                    "11",
+                    "-c",
+                    "2048",
+                    "-b",
+                    "64",
+                    "--prompt-cache",
+                    "/app/models/cache",
+                    "--prompt-cache-all",
+                    "-m",
+                    "/app/models/wizardlm-7b-uncensored.ggccv1.q8_0.bin",
+                    "-p",
+                    prompt,
+                ],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            print("ran subprocess")
+            response = (
+                result.stdout.replace(prompt, "").replace("<|endoftext|>", "").strip()
+            )
 
-        return create_response(response)
+            print("Parsed response, creating response object")
+            return create_response(response)
+        except Exception as e:
+            # print traceback
+            print(e)
+            return create_response("Error")
 
 
 app = Litestar(route_handlers=[FalconController])
