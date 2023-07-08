@@ -35,19 +35,22 @@ class FalconController(Controller):
     async def run(self, data: Request) -> str:
         print(data.messages)
         prompt = create_prompt(data.messages)
+        print(f"Calling falcon with prompt: {prompt}")
         result = subprocess.run(
-            "/usr/local/bin/falcon_main",
-            "-t",
-            "11",
-            "-n",
-            "32",
-            "-m",
-            "/app/models/wizardlm-uncensored-falcon-40b.ggccv1.q5_k.bin",
-            "-p",
-            prompt,
+            [
+                "/usr/local/bin/falcon_main",
+                "-t",
+                "11",
+                "-n",
+                "32",
+                "-m",
+                "/app/models/wizardlm-uncensored-falcon-40b.ggccv1.q5_k.bin",
+                "-p",
+                prompt,
+            ],
             stdout=subprocess.PIPE,
         )
-        return result
+        return result.stdout
 
 
 app = Litestar(route_handlers=[FalconController])
