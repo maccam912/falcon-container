@@ -91,6 +91,7 @@ class FalconController(Controller):
                 prompt,
             ],
             stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
         )
         print(f"Response: {result.stdout}")
         response = (
