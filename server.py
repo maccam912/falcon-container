@@ -98,6 +98,7 @@ class FalconController(Controller):
                 ],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
+                encoding='utf8',
             )
             logger.info("ran subprocess")
             response = (
