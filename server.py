@@ -87,9 +87,11 @@ class FalconController(Controller):
             ],
             stdout=subprocess.PIPE,
         )
+        print(f"Response: {result.stdout}")
         response = (
             result.stdout.replace(prompt, "").replace("<|endoftext|>", "").strip()
         )
+        print(f"Parsed response: {response}")
 
         return create_response(response)
 
