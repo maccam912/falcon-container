@@ -14,15 +14,18 @@ class Request(BaseModel):
     model: str
     messages: List[Message]
 
+
 class Usage(BaseModel):
     prompt_tokens: int
     completion_tokens: int
     total_tokens: int
 
+
 class Choice(BaseModel):
     index: int
     message: Message
     finish_reason: Literal["length", "stop", "restart"]
+
 
 class Response(BaseModel):
     id: str
@@ -44,8 +47,9 @@ def create_prompt(messages: List[Message]) -> str:
         prompt += "### Response:\n"
     return prompt
 
+
 def create_response(result: str) -> Response:
-    return Response(
+    response = Response(
         id="",
         object="",
         created=0,
@@ -56,14 +60,16 @@ def create_response(result: str) -> Response:
                 finish_reason="length",
             )
         ],
-        usage=Usage(prompt_tokens=0, completion_tokens=0, total_tokens=0))
+        usage=Usage(prompt_tokens=0, completion_tokens=0, total_tokens=0),
+    )
+    return response
 
 
 class FalconController(Controller):
     path = "/v1/chat/completions"
 
     @post()
-    async def run(self, data: Request) -> str:
+    async def run(self, data: Request) -> Response:
         print(data.messages)
         prompt = create_prompt(data.messages)
         print(f"Calling falcon with prompt: {prompt}")
