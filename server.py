@@ -1,4 +1,3 @@
-from turtle import st
 from typing import List, Literal
 from litestar import Litestar
 from litestar import Controller, post
