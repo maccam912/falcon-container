@@ -50,6 +50,10 @@ class FalconController(Controller):
             ],
             stdout=subprocess.PIPE,
         )
+        response = (
+            result.stdout.replace(prompt, "").replace("<|endoftext|>", "").strip()
+        )
+
         return result.stdout
 
 
