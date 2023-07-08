@@ -40,12 +40,12 @@ def create_prompt(messages: List[Message]) -> str:
     prompt = ""
     for m in messages:
         if m.role == "user":
-            prompt += m.content + "\n"
+            prompt += "### User:" + "\n" + m.content + "\n"
         elif m.role == "assistant":
             prompt += "### Response:" + "\n" + m.content + "\n"
         elif m.role == "system":
             prompt += "### System:" + "\n" + m.content + "\n"
-        prompt += "### Response:\n"
+    prompt += "### Response:\n"
     return prompt
 
 
