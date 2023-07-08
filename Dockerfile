@@ -10,6 +10,6 @@ FROM ubuntu as deploy
 WORKDIR /app
 COPY --from=build /app/ggllm.cpp/build/bin/* /usr/local/bin/
 COPY startup.sh .
-RUN apt-get update && apt-get install wget python3 -y
-# CMD bash startup.sh
-CMD python3 -m http.server 8080
+RUN apt-get update && apt-get install wget python3 python3-pip -y
+RUN pip install -U litestar uvicorn
+CMD bash startup.sh
