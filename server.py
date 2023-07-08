@@ -82,17 +82,19 @@ class FalconController(Controller):
                 "2048",
                 "-b",
                 "64",
+                "--prompt-cache",
+                "/app/models/cache",
+                "--prompt-cache-all",
                 "-m",
                 "/app/models/wizardlm-7b-uncensored.ggccv1.q8_0.bin",
                 "-p",
                 prompt,
             ],
         )
-        # print(f"Response: {result.stdout}")
-        response = "hey"
-        # response = (
-        #     result.stdout.replace(prompt, "").replace("<|endoftext|>", "").strip()
-        # )
+        print(f"Response: {result.stdout}")
+        response = (
+            result.stdout.replace(prompt, "").replace("<|endoftext|>", "").strip()
+        )
         print(f"Parsed response: {response}")
 
         return create_response(response)
