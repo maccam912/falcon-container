@@ -79,7 +79,7 @@ class FalconController(Controller):
                 "-t",
                 "11",
                 "-n",
-                "32",
+                "2048",
                 "-m",
                 "/app/models/wizardlm-uncensored-falcon-40b.ggccv1.q5_k.bin",
                 "-p",
