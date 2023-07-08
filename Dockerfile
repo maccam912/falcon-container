@@ -10,5 +10,6 @@ FROM ubuntu as deploy
 WORKDIR /app
 COPY --from=build /app/ggllm.cpp/build/bin/* /usr/local/bin/
 COPY startup.sh .
-RUN apt-get update && apt-get install wget -y
-CMD bash startup.sh
+RUN apt-get update && apt-get install wget python3 -y
+# CMD bash startup.sh
+CMD python3 -m http.server 8080
