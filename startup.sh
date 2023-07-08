@@ -11,4 +11,4 @@ if [ ! -f /app/models/wizardlm-7b-uncensored.ggccv1.q8_0.bin ]; then
     popd
 fi
 
-uvicorn server:app --host=0.0.0.0 --log-level trace
+uvicorn server:app --host=0.0.0.0 --log-level info
