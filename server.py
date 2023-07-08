@@ -6,13 +6,30 @@ import subprocess
 
 
 class Message(BaseModel):
-    role: Literal["system"] | Literal["user"] | Literal["assistant"]
+    role: Literal["system", "user", "assistant"]
     content: str
 
 
 class Request(BaseModel):
     model: str
     messages: List[Message]
+
+class Usage(BaseModel):
+    prompt_tokens: int
+    completion_tokens: int
+    total_tokens: int
+
+class Choice(BaseModel):
+    index: int
+    message: Message
+    finish_reason: Literal["length", "stop", "restart"]
+
+class Response(BaseModel):
+    id: str
+    object: str
+    created: int
+    choices: List[Choice]
+    usage: Usage
 
 
 def create_prompt(messages: List[Message]) -> str:
@@ -26,6 +43,20 @@ def create_prompt(messages: List[Message]) -> str:
             prompt += "### System:" + "\n" + m.content + "\n"
         prompt += "### Response:\n"
     return prompt
+
+def create_response(result: str) -> Response:
+    return Response(
+        id="",
+        object="",
+        created=0,
+        choices=[
+            Choice(
+                index=0,
+                message=Message(role="assistant", content=result),
+                finish_reason="length",
+            )
+        ],
+        usage=Usage(prompt_tokens=0, completion_tokens=0, total_tokens=0))
 
 
 class FalconController(Controller):
@@ -54,7 +85,7 @@ class FalconController(Controller):
             result.stdout.replace(prompt, "").replace("<|endoftext|>", "").strip()
         )
 
-        return result.stdout
+        return create_response(response)
 
 
 app = Litestar(route_handlers=[FalconController])
