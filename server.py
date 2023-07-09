@@ -1,4 +1,6 @@
-from math import log
+import asyncio
+from msvcrt import kbhit
+from litestar.response import Stream
 from typing import List, Literal
 from litestar import Litestar
 from litestar import Controller, post
@@ -69,50 +71,53 @@ def create_response(result: str) -> Response:
     return response
 
 
+async def stream_subprocess_stdout(cmd: List[str]):
+    # Create subprocess
+    process = await asyncio.create_subprocess_exec(*cmd, stdout=subprocess.PIPE)
+
+    # Create async generator
+    while True:
+        if process.returncode is not None:
+            break  # subprocess has finished
+
+        line = await process.stdout.read(1000)  # read up to 1000 bytes
+        if line:
+            yield line
+
+        await asyncio.sleep(0.5)  # wait for half a second
+
+    # Wait for the subprocess to finish
+    await process.wait()
+
+
 class FalconController(Controller):
     path = "/v1/chat/completions"
 
     @post()
-    async def run(self, data: Request) -> Response:
+    async def run(self, data: Request) -> Stream:
         logger.info("In run")
-        try:
-            logger.info("Got request")
-            prompt = create_prompt(data.messages)
-            logger.info("created prompt")
-            result = subprocess.run(
-                [
-                    "/usr/local/bin/falcon_main",
-                    "-t",
-                    "11",
-                    "-c",
-                    "2048",
-                    "-b",
-                    "64",
-                    "--prompt-cache",
-                    "/app/models/cache",
-                    "--prompt-cache-all",
-                    "-m",
-                    "/app/models/wizardlm-7b-uncensored.ggccv1.q8_0.bin",
-                    # "/app/models/wizardlm-uncensored-falcon-40b.ggccv1.q5_k.bin",
-                    "-p",
-                    prompt,
-                ],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                encoding='utf8',
-            )
-            logger.info("ran subprocess")
-            response = (
-                result.stdout.replace(prompt, "").replace("<|endoftext|>", "").strip()
-            )
+        logger.info("Got request")
+        prompt = create_prompt(data.messages)
+        logger.info("created prompt")
+        cmd = [
+            "/usr/local/bin/falcon_main",
+            "-t",
+            "11",
+            "-c",
+            "2048",
+            "-b",
+            "64",
+            "--prompt-cache",
+            "/app/models/cache",
+            "--prompt-cache-all",
+            "-m",
+            "/app/models/wizardlm-7b-uncensored.ggccv1.q8_0.bin",
+            # "/app/models/wizardlm-uncensored-falcon-40b.ggccv1.q5_k.bin",
+            "-p",
+            prompt,
+        ]
 
-            logger.info("Parsed response, creating response object")
-            return create_response(response)
-        except Exception as e:
-            # print traceback
-            print(e)
-            logger.error(e)
-            return create_response("Error")
+        return Stream(stream_subprocess_stdout(cmd))
 
 
 app = Litestar(route_handlers=[FalconController])
