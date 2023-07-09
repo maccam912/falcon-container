@@ -130,12 +130,13 @@ async def stream_subprocess_stdout(cmd: List[str]):
         line = await process.stdout.read(1000)  # read up to 1000 bytes
         if line:
             logger.info(f"Got line: {line}")
-            yield create_delta(line)
+            yield create_delta(line).json()
 
         await asyncio.sleep(0.5)  # wait for half a second
 
     # Wait for the subprocess to finish
     await process.wait()
+    yield create_delta("[DONE]").json()
 
 
 class FalconController(Controller):
