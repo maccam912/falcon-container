@@ -93,14 +93,14 @@ def create_response(result: str) -> Response:
 
 
 def create_role_or_content(result: str) -> Role | Content:
-    if result.startswith("### Response:"):
-        return Role(role="assistant")
-    elif result.startswith("### System:"):
-        return Role(role="system")
-    elif result.startswith("### User:"):
-        return Role(role="user")
-    else:
-        return Content(content=result)
+    # if result.startswith("### Response:"):
+    #     return Role(role="assistant")
+    # elif result.startswith("### System:"):
+    #     return Role(role="system")
+    # elif result.startswith("### User:"):
+    #     return Role(role="user")
+    # else:
+    return Content(content=result)
 
 
 def create_delta(result: str) -> Delta:
