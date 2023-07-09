@@ -26,10 +26,24 @@ class Usage(BaseModel):
     total_tokens: int
 
 
+class Content(BaseModel):
+    content: str
+
+
+class Role(BaseModel):
+    role: str
+
+
 class Choice(BaseModel):
     index: int
     message: Message
     finish_reason: Literal["length", "stop", "restart"]
+
+
+class DeltaChoice(BaseModel):
+    index: int
+    finish_reason: None | Literal["length", "stop", "restart"]
+    delta: Role | Content
 
 
 class Response(BaseModel):
@@ -38,6 +52,14 @@ class Response(BaseModel):
     created: int
     choices: List[Choice]
     usage: Usage
+
+
+class Delta(BaseModel):
+    id: str
+    object: str
+    created: int
+    model: str
+    choices: List[DeltaChoice]
 
 
 def create_prompt(messages: List[Message]) -> str:
@@ -68,6 +90,32 @@ def create_response(result: str) -> Response:
         usage=Usage(prompt_tokens=0, completion_tokens=0, total_tokens=0),
     )
     return response
+
+
+def create_role_or_content(result: str) -> Role | Content:
+    if result.startswith("### Response:"):
+        return Role(role="assistant")
+    elif result.startswith("### System:"):
+        return Role(role="system")
+    elif result.startswith("### User:"):
+        return Role(role="user")
+    else:
+        return Content(content=result)
+
+
+def create_delta(result: str) -> Delta:
+    delta = Delta(
+        id="",
+        object="",
+        created=0,
+        model="",
+        choices=[
+            DeltaChoice(
+                index=0, finish_reason=None, delta=create_role_or_content(result)
+            )
+        ],
+    )
+    return delta
 
 
 async def stream_subprocess_stdout(cmd: List[str]):
