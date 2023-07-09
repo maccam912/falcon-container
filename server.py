@@ -1,5 +1,4 @@
 import asyncio
-from msvcrt import kbhit
 from litestar.response import Stream
 from typing import List, Literal
 from litestar import Litestar
