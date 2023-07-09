@@ -160,8 +160,8 @@ class FalconController(Controller):
             "/app/models/cache",
             "--prompt-cache-all",
             "-m",
-            "/app/models/wizardlm-7b-uncensored.ggccv1.q8_0.bin",
-            # "/app/models/wizardlm-uncensored-falcon-40b.ggccv1.q5_k.bin",
+            # "/app/models/wizardlm-7b-uncensored.ggccv1.q8_0.bin",
+            "/app/models/wizardlm-uncensored-falcon-40b.ggccv1.q5_k.bin",
             "-p",
             prompt,
         ]
